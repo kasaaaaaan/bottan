@@ -75,10 +75,6 @@
   .tb { border: none; font: inherit; color: #4a3b2a; background: #fff; border-radius: 14px; box-shadow: 0 4px 0 rgba(0,0,0,.15); }
   .tb:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,.15); }
   .dim { opacity: .35; }
-  #finger { position: fixed; z-index: 26; font-size: 52px; pointer-events: none; display: none;
-    filter: drop-shadow(0 3px 2px rgba(0,0,0,.25)); animation: poke .8s ease-in-out infinite; }
-  #finger.on { display: block; }
-  @keyframes poke { 50% { transform: translateY(-14px); } }
 
   /* レジ */
   .reji { width: min(100%, 360px); display: flex; flex-direction: column; gap: 8px; }
@@ -429,7 +425,7 @@ const REACTIONS = [
     }, i * 120);
   },
 ];
-function clearFx() { dom.innerHTML = ''; parts = []; document.querySelectorAll('.flyer').forEach(f => f.remove()); if (window.guideOff) guideOff(); }
+function clearFx() { dom.innerHTML = ''; parts = []; document.querySelectorAll('.flyer').forEach(f => f.remove()); }
 
 /* ===================== シールちょう ===================== */
 const STICKERS = ['🐶','🐱','🐰','🐻','🐼','🐨','🦁','🐷','🐸','🐧','🐘','🦒','🦄','🦖','🐳','🦋',
@@ -497,25 +493,12 @@ const STOP = {};
 async function sleep(ms) { const s = sid; await wait(ms); if (s !== sid) throw STOP; }
 function setBig(label, on = true) { big.textContent = label; big.classList.toggle('off', !on); }
 function setHint(t) { hintEl.textContent = t; }
-// つぎに おす ところを ゆびで さす（3さいでも わかるように）
-let guideEl = null;
-const finger = document.createElement('div'); finger.id = 'finger'; finger.textContent = '👆'; document.body.appendChild(finger);
-function placeFinger() {
-  if (!guideEl || !document.body.contains(guideEl) || !cur) { finger.classList.remove('on'); return; }
-  const r = guideEl.getBoundingClientRect();
-  const isBig = guideEl === big; // おおきい ボタンは もじに かからないよう みぎしたから さす
-  finger.style.left = (isBig ? r.right - 46 : r.left + r.width / 2 - 24) + 'px';
-  finger.style.top = Math.min(isBig ? r.bottom - 40 : r.bottom - 18, innerHeight - 70) + 'px';
-  finger.classList.add('on');
-}
+// つぎに おす ところを ひからせる
 function guide(el) {
   document.querySelectorAll('.guide').forEach(e => e.classList.remove('guide'));
-  if (el && el.classList.contains('many') && el.children.length) el = pick([...el.children]); // ならんでいる ものは どれか ひとつを さす
-  guideEl = el || null; if (el) el.classList.add('guide');
-  finger.classList.remove('on'); if (el) setTimeout(placeFinger, 650); // うごきが おちついてから
+  if (el && el.classList.contains('many') && el.children.length) el = pick([...el.children]); // ならんでいる ものは どれか ひとつ
+  if (el) el.classList.add('guide');
 }
-addEventListener('resize', placeFinger);
-function guideOff() { guideEl = null; finger.classList.remove('on'); }
 function shake(el) { el.classList.remove('wiggle'); void el.offsetWidth; el.classList.add('wiggle'); }
 let lastNag = 0;
 function nag() { // いま なにを すればいいか こえで おしえる（しつこくならないように）
