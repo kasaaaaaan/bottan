@@ -1,6 +1,6 @@
 // オフラインでも あそべるようにする Service Worker
 // 中身を更新したら VERSION を上げてください（古いキャッシュが消えます）
-const VERSION = 'v1';
+const VERSION = 'v2';
 const CACHE = 'oshite-' + VERSION;
 const ASSETS = [
   './',

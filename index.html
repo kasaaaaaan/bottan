@@ -44,16 +44,16 @@
   .card .nm { font-size: clamp(18px, 5vw, 24px); text-shadow: 0 2px 0 rgba(0,0,0,.15); }
 
   /* ---------- あそぶ画面 ---------- */
-  #play { justify-content: space-evenly; padding: calc(60px + var(--st)) 16px calc(24px + var(--sb)); transition: background .3s; }
+  #play { justify-content: space-between; gap: 14px; padding: calc(64px + var(--st)) 14px calc(28px + var(--sb)); transition: background .3s; }
   #back {
     position: absolute; top: calc(12px + var(--st)); left: 12px; border: none; border-radius: 999px;
     background: rgba(255,255,255,.85); font: inherit; font-size: 18px; padding: 10px 18px;
     color: #4a3b2a; box-shadow: 0 3px 0 rgba(0,0,0,.12); z-index: 30;
   }
-  #display { min-height: 190px; width: 100%; display: flex; align-items: center; justify-content: center; }
+  #display { flex: 1 1 auto; min-height: 0; width: 100%; display: flex; align-items: center; justify-content: center; }
   #big {
-    width: min(64vw, 260px); height: min(64vw, 260px); border-radius: 50%; border: 8px solid rgba(255,255,255,.7);
-    font: inherit; font-size: clamp(30px, 9vw, 44px); color: #fff; letter-spacing: 2px;
+    width: min(50vw, 200px, 25vh); height: min(50vw, 200px, 25vh); border-radius: 50%; border: 8px solid rgba(255,255,255,.7);
+    font: inherit; font-size: clamp(22px, 6.5vw, 32px); color: #fff; letter-spacing: 1px; line-height: 1.2; padding: 0 10px;
     text-shadow: 0 3px 0 rgba(0,0,0,.2); position: relative; z-index: 5;
     box-shadow: 0 14px 0 var(--dark), 0 18px 30px rgba(0,0,0,.25), inset 0 -10px 0 rgba(0,0,0,.12), inset 0 10px 0 rgba(255,255,255,.25);
     transition: transform .07s, box-shadow .07s; background: var(--btn);
@@ -64,40 +64,131 @@
   @keyframes glow { to { filter: brightness(1.35); } }
   #big.wiggle { animation: wiggle .3s; }
   @keyframes wiggle { 25% { transform: rotate(-6deg) } 75% { transform: rotate(6deg) } }
-  #hint { font-size: 20px; opacity: .7; animation: hop 1.4s infinite; }
+  #hint { font-size: 19px; opacity: .8; min-height: 28px; text-align: center; animation: hop 1.4s infinite; }
 
-  /* 表示部品 */
-  .receipt { background: #fff; border-radius: 6px; padding: 14px 22px 18px; text-align: center;
-    box-shadow: 0 6px 16px rgba(0,0,0,.15); animation: slide .5s ease-out; min-width: 210px;
-    border-bottom: 6px dashed #eee; }
-  .receipt .items { font-size: 44px; } .receipt .price { font-size: 38px; color: #e64545; }
-  .receipt .ty { font-size: 18px; }
+  /* ---------- 共通（手順ガイド） ---------- */
+  #big.off { filter: grayscale(.85) brightness(1.05); opacity: .45; }
+  #big.guide { animation: glow .7s ease-in-out infinite alternate; }
+  .guide { outline: 4px dashed #ffb400; outline-offset: 5px; animation: gd .9s steps(1) infinite; }
+  @keyframes gd { 50% { outline-color: transparent; } }
+  .wiggle, #big.wiggle { animation: wiggle .3s; }
+  .tb { border: none; font: inherit; color: #4a3b2a; background: #fff; border-radius: 14px; box-shadow: 0 4px 0 rgba(0,0,0,.15); }
+  .tb:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,.15); }
+  .dim { opacity: .35; }
+
+  /* レジ */
+  .reji { width: min(100%, 360px); display: flex; flex-direction: column; gap: 8px; }
+  .lcd { background: #1f3b2c; color: #7dffb0; border: 5px solid #555; border-radius: 12px; padding: 4px 14px;
+    text-shadow: 0 0 8px #3fd07a; display: flex; justify-content: space-between; align-items: baseline; gap: 10px; min-height: 52px; }
+  #lcd1 { font-size: 20px; } #lcd2 { font-size: 30px; white-space: nowrap; }
+  .tray { min-height: 46px; background: #fff; border: 3px dashed #f3c6b0; border-radius: 12px; font-size: 30px;
+    display: flex; flex-wrap: wrap; justify-content: center; align-items: center; }
+  .tray em { font-size: 16px; color: #c9a99a; font-style: normal; }
+  .shelf { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .shelf.pay { grid-template-columns: repeat(3, 1fr); }
+  .good { display: flex; flex-direction: column; align-items: center; padding: 4px 0 3px; }
+  .good span { font-size: 34px; line-height: 1.15; } .good small { font-size: 14px; }
+  .cash { padding: 8px 0; font-size: 18px; } .cash span { display: block; font-size: 38px; line-height: 1.2; }
+  .receipt { background: #fff; border-radius: 6px; padding: 12px 22px 14px; box-shadow: 0 6px 16px rgba(0,0,0,.15);
+    animation: slide .5s ease-out; min-width: 250px; border-bottom: 6px dashed #eee; }
+  .receipt .items { font-size: 34px; text-align: center; }
+  .receipt .row { display: flex; justify-content: space-between; font-size: 20px; gap: 18px; }
+  .receipt .row.sum { font-size: 26px; color: #e64545; border-top: 2px dashed #ddd; margin-top: 4px; padding-top: 4px; }
+  .receipt .ty { font-size: 18px; text-align: center; margin-top: 6px; }
   @keyframes slide { from { transform: translateY(-40px); opacity: 0 } to { transform: none; opacity: 1 } }
-  .monitor { width: 230px; height: 170px; background: #26323a; border-radius: 18px; border: 10px solid #9aa6ad;
-    display: flex; align-items: center; justify-content: center; font-size: 96px; overflow: hidden; }
+
+  /* ピンポン */
+  .house { display: flex; gap: 18px; align-items: flex-end; }
+  .monitor { width: 150px; height: 120px; background: #26323a; border-radius: 14px; border: 8px solid #9aa6ad;
+    display: flex; align-items: center; justify-content: center; font-size: 72px; overflow: hidden; }
+  .monitor .q { font-size: 22px; color: #789; }
   .monitor .who { animation: peek .6s ease-out; }
   @keyframes peek { from { transform: translateY(120px) } to { transform: none } }
-  .sign { background: #2b2233; color: #4e3d55; font-size: 36px; padding: 18px 26px; border-radius: 14px;
-    border: 6px solid #6d5a78; letter-spacing: 3px; transition: all .2s; }
+  .doorway { width: 130px; height: 190px; background: #fdf3df; border: 8px solid #a0704a; border-bottom: none;
+    border-radius: 8px 8px 0 0; position: relative; perspective: 500px; display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-end; font-size: 64px; line-height: 1.1; }
+  .doorway .gift { font-size: 40px; }
+  .door { position: absolute; inset: 0; background: #c98b55; box-shadow: inset 0 0 0 6px #b0743f; transform-origin: left; transition: transform .8s; }
+  .door::after { content: ''; position: absolute; right: 12px; top: 50%; width: 14px; height: 14px; border-radius: 50%; background: #ffd35c; }
+  .door.open { transform: rotateY(-80deg); }
+
+  /* バス */
+  .bus { width: min(100%, 360px); display: flex; flex-direction: column; gap: 8px; }
+  .led { background: #1b1b1b; color: #ffb233; border: 4px solid #555; border-radius: 10px; padding: 4px 12px;
+    display: flex; align-items: baseline; gap: 10px; text-shadow: 0 0 8px #ff9d00; overflow: hidden; }
+  .led small { font-size: 16px; white-space: nowrap; } .led b { font-size: 26px; white-space: nowrap; }
+  .route { display: flex; position: relative; }
+  .route::before { content: ''; position: absolute; left: 12%; right: 12%; top: 21px; height: 6px; background: #c9b6e8; border-radius: 3px; }
+  .route div { position: relative; width: 25%; display: flex; flex-direction: column; align-items: center; font-size: 12px; text-align: center; }
+  .route div span { width: 46px; height: 46px; border-radius: 50%; background: #fff; border: 3px solid #c9b6e8;
+    display: flex; align-items: center; justify-content: center; font-size: 26px; }
+  .route div.nx { font-weight: 800; color: #5f3a92; font-size: 13px; } .route div.nx span { border-color: #8e5bd1; background: #fff2a8; }
+  .road { height: 86px; border-radius: 12px; position: relative; overflow: hidden; background: linear-gradient(#bfe6ff 0 62%, #8a8a8a 62%); }
+  .road .scene { position: absolute; bottom: 30px; left: 0; white-space: nowrap; font-size: 34px; animation: scroll 5s linear infinite; }
+  @keyframes scroll { to { transform: translateX(-50%) } }
+  .road .me { position: absolute; left: 22%; bottom: 4px; font-size: 54px; line-height: 1; }
+  .road .me span { display: inline-block; transform: scaleX(-1); animation: rattle .25s infinite alternate; }
+  .road.stop .scene, .road.stop .me span { animation-play-state: paused; }
+  .road .bs { position: absolute; right: 12%; bottom: 24px; font-size: 40px; opacity: 0; transition: opacity .5s; }
+  .road .bs.show { opacity: 1; }
+  .sign { background: #2b2233; color: #4e3d55; font-size: 26px; padding: 6px 12px; border-radius: 12px; text-align: center;
+    border: 5px solid #6d5a78; letter-spacing: 3px; transition: all .2s; }
   .sign.lit { color: #ffd6f2; text-shadow: 0 0 12px #ff5fc8, 0 0 24px #ff5fc8; background: #4a1f45; }
-  .floor { background: #222; color: #ffb233; font-size: 110px; width: 190px; height: 170px; border-radius: 16px;
-    display: flex; align-items: center; justify-content: center; border: 8px solid #c9c9c9;
-    text-shadow: 0 0 14px #ff9d00; font-family: monospace; position: relative; }
-  .floor small { position: absolute; top: 6px; left: 14px; font-size: 26px; color: #ffb233; }
-  .signal { display: flex; flex-direction: column; gap: 10px; background: #333; padding: 12px; border-radius: 16px; }
-  .signal div { width: 110px; height: 80px; border-radius: 10px; background: #1b1b1b; font-size: 54px;
+
+  /* エレベーター */
+  .elev { display: flex; gap: 14px; align-items: center; }
+  .ecol { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .ind { background: #222; color: #ffb233; font-family: monospace; font-size: 40px; width: 130px; text-align: center;
+    border-radius: 10px; border: 5px solid #c9c9c9; text-shadow: 0 0 10px #ff9d00; }
+  .ind span { font-size: 24px; display: inline-block; width: 30px; }
+  .cab { width: 150px; height: 165px; position: relative; overflow: hidden; background: #fff7e0; border: 8px solid #b8c0c8;
+    border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .cab .ins { font-size: 68px; line-height: 1.1; } .cab .nm { font-size: 15px; }
+  .cab .dl, .cab .dr { position: absolute; top: 0; bottom: 0; width: 50%; background: linear-gradient(90deg, #c7ced6, #e8ecef); transition: transform .6s; }
+  .cab .dl { left: 0; transform: translateX(-100%); border-right: 2px solid #9aa4ad; }
+  .cab .dr { right: 0; transform: translateX(100%); }
+  .cab.closed .dl, .cab.closed .dr { transform: none; }
+  .panel { background: #cfd6dd; padding: 12px; border-radius: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .fb { width: 58px; height: 58px; border-radius: 50%; border: 4px solid #8d99a5; background: #f4f6f8; font: inherit;
+    font-size: 24px; color: #4a3b2a; position: relative; }
+  .fb small { position: absolute; right: -10px; bottom: -8px; font-size: 22px; }
+  .fb.lit { background: #fff2a8; border-color: #ffb233; box-shadow: 0 0 12px #ffb233; }
+
+  /* しんごう */
+  .cross { width: min(100%, 340px); display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .cross .top { display: flex; gap: 14px; align-items: center; }
+  .signal { display: flex; flex-direction: column; gap: 8px; background: #333; padding: 10px; border-radius: 16px; }
+  .signal div { width: 90px; height: 66px; border-radius: 10px; background: #1b1b1b; font-size: 44px;
     display: flex; align-items: center; justify-content: center; opacity: .25; }
   .signal .r.on { background: #ff3b3b; opacity: 1; } .signal .g.on { background: #23d160; opacity: 1; }
-  .wait { font-size: 22px; background: #333; color: #555; padding: 6px 14px; border-radius: 8px; margin-top: 8px; text-align: center; }
+  .signal .g.blink { animation: blink .35s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: .25; } }
+  .side { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .meter { display: flex; flex-direction: column-reverse; gap: 4px; background: #333; padding: 6px; border-radius: 8px; }
+  .meter i { width: 30px; height: 11px; background: #444; border-radius: 3px; }
+  .meter i.on { background: #ff9d00; box-shadow: 0 0 6px #ff9d00; }
+  .wait { font-size: 18px; background: #333; color: #555; padding: 6px 10px; border-radius: 8px; text-align: center; }
   .wait.on { color: #ffdd57; text-shadow: 0 0 8px #ffbb00; }
-  .mw { width: 250px; height: 160px; background: #e9e9e9; border-radius: 16px; display: flex; padding: 14px; gap: 12px;
-    box-shadow: 0 6px 0 #bbb; }
+  .zebra { width: 100%; height: 74px; position: relative; border-radius: 10px; border: 6px solid #555;
+    background: repeating-linear-gradient(90deg, #fff 0 22px, #555 22px 40px); }
+  .zebra .kid { position: absolute; left: 2px; bottom: 2px; font-size: 50px; line-height: 1; transition: left 2.6s linear; }
+  .zebra .kid.far { left: calc(100% - 56px); }
+  .zebra .kid.walk { animation: hop .4s infinite; }
+
+  /* でんしレンジ */
+  .mwbox { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .mw { width: 260px; height: 160px; background: #e9e9e9; border-radius: 16px; display: flex; padding: 14px; gap: 12px; box-shadow: 0 6px 0 #bbb; }
   .mw .win { flex: 1; background: #2e2e2e; border-radius: 8px; display: flex; align-items: center; justify-content: center;
-    font-size: 64px; transition: background .3s; }
+    font-size: 64px; transition: background .3s; position: relative; }
   .mw .win.hot { background: #ffcf6b; }
   .mw .win.hot span { animation: spin 1.2s linear infinite; display: inline-block; }
   @keyframes spin { to { transform: rotate(360deg) } }
-  .mw .pnl { width: 40px; background: #ccc; border-radius: 6px; }
+  .mw .win .steam { position: absolute; top: 2px; font-size: 30px; animation: hop .8s infinite; }
+  .mw .pnl { width: 74px; background: #ccc; border-radius: 6px; display: flex; flex-direction: column; align-items: center; padding-top: 10px; gap: 12px; }
+  .dig { background: #1f3b2c; color: #7dffb0; font-family: monospace; font-size: 20px; padding: 2px 5px; border-radius: 4px; text-shadow: 0 0 6px #3fd07a; }
+  .knob { width: 36px; height: 36px; border-radius: 50%; background: #aaa; border: 4px solid #888; }
+  .foods { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; width: min(100%, 340px); }
+  .foods button { font-size: 30px; padding: 6px 0; }
 
   /* ---------- リアクション ---------- */
   #fx { position: fixed; inset: 0; pointer-events: none; z-index: 20; }
@@ -116,19 +207,27 @@
   @keyframes fadeio { 0%,100% { opacity: 0 } 8%,92% { opacity: 1 } }
 
   /* じはんき・ガチャ */
-  .vm { width: 210px; background: #e94b4b; border-radius: 16px; padding: 12px; box-shadow: 0 6px 0 #a92f2f; }
-  .vm .rows { background: #fff; border-radius: 8px; display: grid; grid-template-columns: repeat(3, 1fr); font-size: 40px; text-align: center; padding: 6px; }
-  .vm .slot { margin-top: 10px; height: 64px; background: #2a2a2a; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 48px; overflow: hidden; }
+  .vm { width: 250px; background: #e94b4b; border-radius: 16px; padding: 12px; box-shadow: 0 6px 0 #a92f2f; }
+  .vm .rows { background: #fff; border-radius: 8px; display: grid; grid-template-columns: repeat(3, 1fr); padding: 4px; }
+  .dk { border: none; background: none; font: inherit; color: #4a3b2a; display: flex; flex-direction: column; align-items: center; font-size: 36px; padding: 4px 0; line-height: 1.15; }
+  .dk small { font-size: 13px; } .dk i { width: 22px; height: 8px; border-radius: 4px; background: #ddd; margin-top: 2px; }
+  .dk.lit i { background: #3fd07a; box-shadow: 0 0 8px #3fd07a; }
+  .vm .money { margin-top: 8px; background: #222; color: #ff6b6b; font-family: monospace; text-align: right; padding: 3px 10px; border-radius: 6px; font-size: 22px; }
+  .vm .slot { margin-top: 8px; height: 64px; background: #2a2a2a; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 48px; overflow: hidden; }
   .drop { animation: drop .45s cubic-bezier(.5,0,1,1); }
   @keyframes drop { from { transform: translateY(-80px) } to { transform: none } }
-  .gacha { display: flex; flex-direction: column; align-items: center; }
-  .gacha .dome { width: 170px; height: 150px; border-radius: 50% 50% 12px 12px; background: rgba(210,240,255,.9); border: 6px solid #ccc;
-    font-size: 30px; display: flex; flex-wrap: wrap; align-content: flex-end; justify-content: center; padding: 10px; gap: 2px; }
-  .gacha .dome.shake { animation: wiggle .2s 4; }
-  .gacha .base { width: 170px; height: 46px; background: #ff8c42; border-radius: 0 0 12px 12px; position: relative; }
-  .gacha .out { position: absolute; right: -78px; top: -14px; font-size: 60px; }
+  .gacha { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .gacha .dome { width: 170px; height: min(140px, 17vh); border-radius: 50% 50% 12px 12px; background: rgba(210,240,255,.9); border: 6px solid #ccc;
+    font-size: 24px; display: flex; flex-wrap: wrap; align-content: flex-end; justify-content: center; padding: 10px; gap: 2px; overflow: hidden; }
+  .gacha .dome.shake { animation: wiggle .2s 2; }
+  .gacha .base { width: 170px; height: 60px; background: #ff8c42; border-radius: 0 0 12px 12px; position: relative; }
+  .gacha .handle { position: absolute; left: 50%; top: 8px; width: 44px; height: 44px; margin-left: -22px; border-radius: 50%;
+    background: #fff; border: 4px solid #ddd; font-size: 26px; color: #ff8c42; display: flex; align-items: center; justify-content: center; transition: transform .4s; }
+  .gacha .out { position: absolute; right: -80px; top: -6px; font-size: 60px; }
   .gacha .out.roll { animation: rollout .6s ease-out; }
   @keyframes rollout { from { transform: translateX(-80px) rotate(-360deg); opacity: 0 } to { transform: none; opacity: 1 } }
+  .gacha .turns { font-size: 18px; min-height: 24px; }
+  .coinbtn { padding: 8px 20px; font-size: 20px; }
 
   /* シール */
   #bookBtn { position: absolute; top: calc(12px + var(--st)); right: 12px; border: none; border-radius: 999px; background: rgba(255,255,255,.85);
@@ -369,15 +468,16 @@ function showBook() {
   clearFx(); document.querySelectorAll('.screen').forEach(e => e.classList.remove('on')); $('#book').classList.add('on');
 }
 
-let lastR = -1, presses = 0;
+let lastR = -1, clears = 0;
+// ひとつの あそびを さいごまで やったときだけ よぶ（ごほうび＋シール）
 function celebrate() {
-  presses++;
+  clears++;
   SND.fanfare();
-  if (presses % 10 === 0) {
-    // 10かいごとに だいサービス
+  if (clears % 10 === 0) {
+    // 10かい できるごとに だいサービス
     REACTIONS[0](); REACTIONS[1]();
-    domFx(`<div class="e">🏆</div><div class="t">${presses}かい おしたね！</div>`, 'pop', 2500);
-    say(`すごい！ ${presses}かい おしたね！`);
+    domFx(`<div class="e">🏆</div><div class="t">${clears}かい できたね！</div>`, 'pop', 2500);
+    say(`すごい！ ${clears}かい できたね！`);
   } else {
     let i; do { i = Math.floor(Math.random() * REACTIONS.length); } while (i === lastR);
     lastR = i; REACTIONS[i]();
@@ -385,79 +485,356 @@ function celebrate() {
   giveSticker();
 }
 
+/* ===================== てじゅんの しくみ ===================== */
+const disp = $('#display'), big = $('#big'), play = $('#play'), hintEl = $('#hint');
+let cur = null, running = false, sid = 0;
+const STOP = {};
+// がめんを はなれたら とちゅうの しょりを とめる sleep
+async function sleep(ms) { const s = sid; await wait(ms); if (s !== sid) throw STOP; }
+function setBig(label, on = true) { big.textContent = label; big.classList.toggle('off', !on); }
+function setHint(t) { hintEl.textContent = t; }
+function guide(el) { document.querySelectorAll('.guide').forEach(e => e.classList.remove('guide')); if (el) el.classList.add('guide'); }
+function shake(el) { el.classList.remove('wiggle'); void el.offsetWidth; el.classList.add('wiggle'); }
+let lastNag = 0;
+function nag() { // いま なにを すればいいか こえで おしえる（しつこくならないように）
+  const now = Date.now(); if (now - lastNag < 2500 || !hintEl.textContent) return;
+  lastNag = now; say(hintEl.textContent);
+}
+function run(fn) {
+  if (running) return; running = true; const s = sid;
+  Promise.resolve().then(fn).catch(e => { if (e !== STOP) console.error(e); }).finally(() => { if (s === sid) running = false; });
+}
+function onTap(el, fn) {
+  el.addEventListener('click', e => {
+    e.stopPropagation(); audio(); buzz(15);
+    if (running) { shake(el); return; }
+    run(() => fn(el));
+  });
+}
+function btn(cls, html) { const b = document.createElement('button'); b.className = cls; b.innerHTML = html; return b; }
+
+SND.coin = () => { tone(2600, 0, .07, 'square', .07); tone(3300, .05, .3, 'sine', .15); };
+SND.psh  = () => { tone(500, 0, .5, 'sawtooth', .04, 120); };
+
 /* ===================== ボタンのしゅるい ===================== */
-const disp = $('#display');
+const GOODS = [['🍎', 'りんご', 100], ['🍌', 'バナナ', 50], ['🍓', 'いちご', 200], ['🍩', 'ドーナツ', 150],
+               ['🍦', 'アイス', 100], ['🍪', 'クッキー', 50], ['🥛', 'ぎゅうにゅう', 150], ['🍙', 'おにぎり', 100]];
+const STOPS = [['🚉', 'えきまえ'], ['🌳', 'こうえん'], ['🦁', 'どうぶつえん'], ['🏫', 'ようちえん'], ['🛒', 'スーパー'],
+               ['🏥', 'びょういん'], ['🌊', 'うみ'], ['🎡', 'ゆうえんち'], ['📚', 'としょかん']];
+const FLOORS = { 1: ['🚪', 'いりぐち'], 2: ['🧸', 'おもちゃ うりば'], 3: ['📚', 'ほんや さん'], 4: ['🍦', 'アイス やさん'],
+                 5: ['🍽️', 'レストラン'], 6: ['🎡', 'おくじょう ゆうえんち'] };
+
 const THEMES = [
-  { id: 'reji', ico: '🛒', name: 'おみせの レジ', card: '#ff7a59', bg: '#ffe9dc', btn: '#ff5a5a', dark: '#c23b3b', label: 'せいさん',
-    init() { disp.innerHTML = '<div style="font-size:90px">🛒🧺</div>'; },
+  /* ---------- レジ：しょうひんを えらぶ → ごうけい → おかねを もらう → おかいけい ---------- */
+  { id: 'reji', ico: '🛒', name: 'おみせの レジ', card: '#ff7a59', bg: '#ffe9dc', btn: '#ff5a5a', dark: '#c23b3b',
+    init() {
+      this.cart = []; this.paid = 0; this.phase = 'scan';
+      disp.innerHTML = `<div class="reji"><div class="lcd"><span id="lcd1">いらっしゃいませ</span><span id="lcd2"></span></div>
+        <div class="tray" id="tray"></div><div class="shelf" id="shelf"></div></div>`;
+      this.draw(); setBig('ごうけい', false); setHint('しょうひんを タッチしてね'); guide($('#shelf'));
+    },
+    total() { return this.cart.reduce((a, g) => a + g[2], 0); },
+    lcd(a, b) { $('#lcd1').textContent = a; $('#lcd2').textContent = b; },
+    draw() {
+      $('#tray').innerHTML = this.cart.map(g => `<span>${g[0]}</span>`).join('') || '<em>かご</em>';
+      const sh = $('#shelf'); sh.innerHTML = ''; sh.classList.toggle('pay', this.phase === 'pay');
+      if (this.phase === 'scan') GOODS.forEach(g => {
+        const b = btn('tb good', `<span>${g[0]}</span><small>${g[2]}えん</small>`); onTap(b, el => this.scan(g, el)); sh.appendChild(b);
+      });
+      else [[100, '🪙'], [500, '🪙'], [1000, '💴']].forEach(([v, e]) => {
+        const b = btn('tb cash', `<span>${e}</span>${v}えん`); onTap(b, el => this.pay(v, el)); sh.appendChild(b);
+      });
+    },
+    scan(g, el) {
+      if (this.cart.length >= 6) { shake(el); say('かごが いっぱいだよ。ごうけいを おしてね'); guide(big); return; }
+      this.cart.push(g); SND.pi(); this.lcd(`${g[0]} ${g[1]}`, `${g[2]}えん`); say(`${g[1]}、${g[2]}えん`);
+      $('#tray').innerHTML = this.cart.map(g => `<span>${g[0]}</span>`).join('');
+      setBig('ごうけい', true); setHint('おわったら ごうけい を おしてね'); guide(big);
+    },
+    pay(v, el) {
+      const t = this.total();
+      if (this.paid >= t) { shake(el); guide(big); return; }
+      this.paid += v; SND.coin(); this.lcd(`おあずかり`, `${this.paid}えん`);
+      if (this.paid >= t) { say(`${this.paid}えん おあずかりします`); setBig('おかいけい', true); setHint('おかいけい を おしてね'); guide(big); }
+      else say(`あと ${t - this.paid}えん`);
+    },
     async press() {
-      SND.pi(); await wait(150); SND.pi();
-      const items = []; for (let i = 0; i < 3; i++) items.push(pick(YUMMY));
-      const price = pick([100, 200, 300, 500, 1000]);
-      disp.innerHTML = `<div class="receipt"><div class="items">${items.join('')}</div><div class="price">${price}えん</div><div class="ty">ありがとうございました</div></div>`;
-      await wait(250); SND.chin(); say(`${price}えんです。ありがとうございました！`);
-      await wait(700); celebrate();
+      if (this.phase === 'scan') {
+        SND.pi(); await sleep(120); SND.pi();
+        const t = this.total(); this.phase = 'pay'; this.draw(); this.lcd('ごうけい', `${t}えん`);
+        say(`ごうけい ${t}えんです`);
+        setBig('おかいけい', false); setHint('おかねを タッチしてね'); guide($('#shelf'));
+      } else if (this.phase === 'pay') {
+        this.phase = 'done'; setBig('ありがとう', false); guide(null); setHint('');
+        const t = this.total(), ch = this.paid - t;
+        tone(180, 0, .15, 'square', .15); await sleep(200); SND.chin();
+        disp.innerHTML = `<div class="receipt"><div class="items">${this.cart.map(g => g[0]).join('')}</div>
+          <div class="row sum"><span>ごうけい</span><span>${t}えん</span></div>
+          <div class="row"><span>おあずかり</span><span>${this.paid}えん</span></div>
+          <div class="row"><span>おつり</span><span>${ch}えん</span></div>
+          <div class="ty">ありがとうございました</div></div>`;
+        say(ch ? `おつりは ${ch}えんです。ありがとうございました！` : 'ちょうど いただきます。ありがとうございました！');
+        await sleep(1500); celebrate(); await sleep(3000);
+        setBig('つぎの おきゃくさん', true); setHint('つぎの おきゃくさんを よぼう'); guide(big);
+      } else { SND.pop(); this.init(); say('いらっしゃいませ！'); }
     } },
-  { id: 'ping', ico: '🔔', name: 'ピンポン', card: '#3fb6a8', bg: '#e0f7f3', btn: '#2fa597', dark: '#1d7a6f', label: 'ピンポン',
-    init() { disp.innerHTML = '<div class="monitor"><span style="font-size:40px;color:#567">だれかな？</span></div>'; },
+
+  /* ---------- ピンポン：ならす → だれか きた → ドアを あける ---------- */
+  { id: 'ping', ico: '🔔', name: 'ピンポン', card: '#3fb6a8', bg: '#e0f7f3', btn: '#2fa597', dark: '#1d7a6f',
+    init() {
+      this.phase = 'ring';
+      disp.innerHTML = `<div class="house"><div class="monitor" id="mon"><span class="q">だれかな？</span></div>
+        <div class="doorway"><span id="who"></span><span class="gift" id="gift"></span><div class="door" id="door"></div></div></div>`;
+      setBig('ピンポン', true); setHint('ピンポン を おしてね'); guide(big);
+    },
     async press() {
-      SND.pinpon();
-      const v = pick([['🐶', 'わんちゃん'], ['🐻', 'くまさん'], ['🐧', 'ペンギンさん'], ['🐸', 'かえるさん'], ['🐷', 'ぶたさん'], ['🐰', 'うさぎさん'], ['🦁', 'ライオンさん'], ['🐘', 'ぞうさん']]);
-      await wait(800);
-      disp.innerHTML = `<div class="monitor"><span class="who">${v[0]}</span></div>`;
-      say(`はーい！ ${v[1]}が きたよ！`); await wait(600); celebrate();
+      if (this.phase === 'ring') {
+        setBig('ピンポン', false); guide(null); SND.pinpon();
+        const v = this.v = pick([['🐶', 'わんちゃん', 'あそびに きたよ！', '⚽'], ['🐻', 'くまさん', 'はちみつを どうぞ！', '🍯'],
+          ['🐧', 'ペンギンさん', 'おとどけものです！', '📦'], ['🐸', 'かえるさん', 'かさを かえしに きたよ！', '☂️'],
+          ['🐷', 'ぶたさん', 'ケーキを やいたよ！', '🍰'], ['🐰', 'うさぎさん', 'にんじん どうぞ！', '🥕'],
+          ['🦁', 'ライオンさん', 'おてがみです！', '💌'], ['🐘', 'ぞうさん', 'おはなを どうぞ！', '💐']]);
+        await sleep(1100);
+        $('#mon').innerHTML = `<span class="who">${v[0]}</span>`;
+        say(`${v[1]}が きたよ！ ドアを あけてあげよう`);
+        this.phase = 'door'; setBig('はーい！', true); setHint('はーい！ で ドアを あけてね'); guide(big);
+      } else {
+        const v = this.v; this.phase = 'visit'; setBig('はーい！', false); guide(null); setHint('');
+        $('#who').textContent = v[0]; $('#gift').textContent = v[3];
+        tone(300, 0, .2, 'triangle', .15); $('#door').classList.add('open');
+        await sleep(800); say(`こんにちは！ ${v[2]}`);
+        await sleep(1500); celebrate(); await sleep(3500);
+        say('またね！'); $('#door').classList.remove('open'); await sleep(900);
+        this.init();
+      }
     } },
-  { id: 'bus', ico: '🚌', name: 'バスの ボタン', card: '#9b6bd6', bg: '#efe6fb', btn: '#8e5bd1', dark: '#5f3a92', label: 'とまります',
-    init() { disp.innerHTML = '<div class="sign" id="sign">つぎ とまります</div>'; },
+
+  /* ---------- バス：つぎの ていりゅうじょを みて とまります ---------- */
+  { id: 'bus', ico: '🚌', name: 'バスの ボタン', card: '#9b6bd6', bg: '#efe6fb', btn: '#8e5bd1', dark: '#5f3a92', i: 0,
+    init() {
+      const sc = '🌳🏠　🌲🏢　🌳🏡　🌻🏪　'.repeat(2);
+      disp.innerHTML = `<div class="bus"><div class="led"><small>つぎは</small><b id="nx"></b></div>
+        <div class="route" id="route"></div>
+        <div class="road" id="road"><div class="scene">${sc}${sc}</div><span class="bs" id="bs"></span><span class="me"><span>🚌</span></span></div>
+        <div class="sign" id="sign">つぎ とまります</div></div>`;
+      setBig('とまります', false); setHint('');
+      this.drive().catch(e => { if (e !== STOP) console.error(e); });
+    },
+    st(k = 0) { return STOPS[(this.i + k) % STOPS.length]; },
+    async drive() {
+      let passes = 0;
+      while (true) {
+        const st = this.st(); this.req = false;
+        $('#nx').textContent = `${st[0]} ${st[1]}`;
+        $('#route').innerHTML = [0, 1, 2, 3].map(k => { const s = this.st(k); return `<div class="${k ? '' : 'nx'}"><span>${s[0]}</span>${s[1]}</div>`; }).join('');
+        $('#road').classList.remove('stop'); $('#bs').classList.remove('show');
+        tone(784, 0, .25, 'sine', .2); tone(659, .25, .4, 'sine', .2);
+        say(`つぎは、${st[1]}です`);
+        setBig('とまります', true); setHint(`${st[1]}で おりるなら ボタンを おしてね`); guide(big);
+        let t = 0; while (t < 7000 && !this.req) { await sleep(100); t += 100; }
+        if (this.req) {
+          passes = 0;
+          await sleep(2500);
+          $('#road').classList.add('stop'); $('#bs').textContent = '🚏' + st[0]; $('#bs').classList.add('show');
+          SND.psh(); say(`${st[1]}です。 ごじょうしゃ ありがとうございました`);
+          await sleep(1800); celebrate(); await sleep(3500);
+          $('#sign').classList.remove('lit');
+        } else {
+          setBig('とまります', false); guide(null);
+          if (++passes >= 2) { // だれも おさないときは しゅうてんで ひとやすみ
+            $('#road').classList.add('stop'); say('しゅうてんです');
+            setHint('また のるときは ボタンを おしてね'); this.phase = 'rest';
+            setBig('のる', true); guide(big);
+            while (this.phase === 'rest') await sleep(200);
+            passes = 0;
+          } else { say(`${st[1]}は つうかします`); await sleep(1800); }
+        }
+        this.i++;
+        say('はっしゃします'); SND.psh(); await sleep(1500);
+      }
+    },
     async press() {
-      SND.bus(); $('#sign').classList.add('lit'); say('つぎ、とまります！');
-      await wait(900); celebrate(); await wait(2500); const s = $('#sign'); if (s) s.classList.remove('lit');
+      if (this.phase === 'rest') { this.phase = ''; SND.pop(); return; }
+      this.req = true; SND.bus(); $('#sign').classList.add('lit'); say('つぎ、とまります！');
+      setBig('とまります', false); setHint(`${this.st()[1]}で とまるよ`); guide(null);
     } },
-  { id: 'elev', ico: '🛗', name: 'エレベーター', card: '#7d8ea3', bg: '#eef1f5', btn: '#ffb233', dark: '#c47e0c', label: '▲ うえ',
-    floor: 1, busy: true,
-    init() { disp.innerHTML = `<div class="floor"><small>▲</small><span id="fl">${this.floor}</span></div>`; },
+
+  /* ---------- エレベーター：いきたい かいを えらぶ → しまる ---------- */
+  { id: 'elev', ico: '🛗', name: 'エレベーター', card: '#7d8ea3', bg: '#eef1f5', btn: '#ffb233', dark: '#c47e0c', floor: 1,
+    init() {
+      this.to = null; const f = FLOORS[this.floor];
+      disp.innerHTML = `<div class="elev"><div class="ecol"><div class="ind"><span id="arr"></span><b id="fl">${this.floor}</b></div>
+        <div class="cab" id="cab"><span class="ins" id="ins">${f[0]}</span><span class="nm" id="fnm">${f[1]}</span><div class="dl"></div><div class="dr"></div></div></div>
+        <div class="panel" id="pnl"></div></div>`;
+      [5, 6, 3, 4, 1, 2].forEach(n => {
+        const b = btn('fb', `${n}<small>${FLOORS[n][0]}</small>`); b.dataset.n = n; onTap(b, el => this.select(n, el)); $('#pnl').appendChild(b);
+      });
+      this.ready();
+    },
+    ready() { setBig('しまる ▶◀', false); setHint('いきたい かいを えらんでね'); guide($('#pnl')); },
+    select(n, el) {
+      if (n === this.floor) { shake(el); say(`ここが ${n}かい、${FLOORS[n][1]}だよ`); return; }
+      this.to = n; document.querySelectorAll('.fb').forEach(b => b.classList.toggle('lit', +b.dataset.n === n));
+      SND.pi(); say(`${n}かい、${FLOORS[n][1]}`);
+      setBig('しまる ▶◀', true); setHint('しまる を おしてね'); guide(big);
+    },
     async press() {
-      let to; do { to = 1 + Math.floor(Math.random() * 9); } while (to === this.floor);
-      const step = to > this.floor ? 1 : -1;
-      while (this.floor !== to) { this.floor += step; const f = $('#fl'); if (!f) return; f.textContent = this.floor; SND.tick(); await wait(320); }
-      SND.pon(); say(`${this.floor}かいです！`); await wait(500); celebrate();
+      const to = this.to; setBig('しまる ▶◀', false); guide(null); setHint('');
+      $('#cab').classList.add('closed'); say('ドアが しまります'); await sleep(900);
+      const step = to > this.floor ? 1 : -1; $('#arr').textContent = step > 0 ? '▲' : '▼';
+      while (this.floor !== to) {
+        await sleep(700); this.floor += step; $('#fl').textContent = this.floor; SND.tick();
+        $('#ins').textContent = FLOORS[this.floor][0]; $('#fnm').textContent = FLOORS[this.floor][1];
+      }
+      await sleep(400); SND.pon(); $('#arr').textContent = '';
+      $('#cab').classList.remove('closed'); document.querySelectorAll('.fb').forEach(b => b.classList.remove('lit'));
+      say(`${to}かい、${FLOORS[to][1]}です`); this.to = null;
+      await sleep(1300); celebrate(); await sleep(2500); this.ready();
     } },
-  { id: 'sig', ico: '🚦', name: 'しんごう', card: '#f2b632', bg: '#fff6d8', btn: '#ffcc33', dark: '#c99a10', label: 'おす', busy: true,
-    init() { disp.innerHTML = '<div><div class="signal"><div class="r on">🧍</div><div class="g">🚶</div></div><div class="wait" id="wt">おまちください</div></div>'; },
+
+  /* ---------- しんごう：おす → まつ → あおで わたる ---------- */
+  { id: 'sig', ico: '🚦', name: 'しんごう', card: '#f2b632', bg: '#fff6d8', btn: '#ffcc33', dark: '#c99a10', far: false,
+    init() {
+      disp.innerHTML = `<div class="cross"><div class="top"><div class="signal"><div class="r on">🧍</div><div class="g">🚶</div></div>
+        <div class="side"><div class="meter" id="meter">${'<i></i>'.repeat(6)}</div><div class="wait" id="wt">おまちください</div></div></div>
+        <div class="zebra"><span class="kid ${this.far ? 'far' : ''}" id="kid">🧒</span></div></div>`;
+      this.toRed(false);
+    },
+    toRed(talk = true) {
+      this.phase = 'red'; this.gen = (this.gen || 0) + 1;
+      $('.signal .r').classList.add('on'); $('.signal .g').classList.remove('on', 'blink');
+      if (talk) say('あかに なったよ。とまってね');
+      setBig('おす', true); setHint('わたりたいときは ボタンを おしてね'); guide(big);
+    },
     async press() {
-      SND.pi(); $('#wt').classList.add('on'); say('おまちください');
-      await wait(2000); if (!$('#wt')) return;
-      $('.signal .r').classList.remove('on'); $('.signal .g').classList.add('on'); $('#wt').classList.remove('on');
-      SND.piyo(); say('あおに なったよ！ てを あげて わたろうね'); await wait(700); celebrate();
-      await wait(3000); if (!$('#wt')) return; this.init();
+      if (this.phase === 'red') {
+        SND.pi(); $('#wt').classList.add('on'); say('おまちください');
+        setBig('まってね', false); setHint('あおに なるまで まってね'); guide(null);
+        const m = [...document.querySelectorAll('#meter i')]; m.forEach(i => i.classList.add('on'));
+        for (let k = m.length - 1; k >= 0; k--) { await sleep(600); m[k].classList.remove('on'); }
+        $('.signal .r').classList.remove('on'); $('.signal .g').classList.add('on'); $('#wt').classList.remove('on');
+        SND.piyo(); say('あおに なったよ！ みぎと ひだりを みて、てを あげて わたろう');
+        this.phase = 'green'; setBig('🙋 わたる', true); setHint('てを あげて わたろう'); guide(big);
+        const g = this.gen; // しばらく わたらないと あかに もどる
+        (async () => { await sleep(10000); if (this.gen === g && this.phase === 'green') {
+          $('.signal .g').classList.add('blink'); await sleep(2000); if (this.gen === g && this.phase === 'green') this.toRed(); } })().catch(() => {});
+      } else if (this.phase === 'green') {
+        this.phase = 'walk'; setBig('わたってるよ', false); guide(null); setHint('');
+        const kid = $('#kid'); kid.textContent = '🙋'; kid.classList.add('walk'); this.far = !this.far; kid.classList.toggle('far', this.far);
+        SND.piyo(); await sleep(1300); SND.piyo(); await sleep(1400);
+        kid.classList.remove('walk'); kid.textContent = '🧒'; say('じょうずに わたれたね！');
+        await sleep(600); celebrate(); await sleep(1200);
+        $('.signal .g').classList.add('blink'); await sleep(1800); this.toRed(false);
+      }
     } },
-  { id: 'mw', ico: '🍱', name: 'でんしレンジ', card: '#e86a92', bg: '#ffe6ee', btn: '#ff6f9a', dark: '#c4426b', label: 'あたため', busy: true,
-    init() { disp.innerHTML = '<div class="mw"><div class="win" id="win"><span>🍽️</span></div><div class="pnl"></div></div>'; },
+
+  /* ---------- でんしレンジ：たべものを いれる → あたため → とりだす ---------- */
+  { id: 'mw', ico: '🍱', name: 'でんしレンジ', card: '#e86a92', bg: '#ffe6ee', btn: '#ff6f9a', dark: '#c4426b',
+    init() {
+      this.phase = 'choose'; this.f = null;
+      disp.innerHTML = `<div class="mwbox"><div class="mw"><div class="win" id="win"><span>🍽️</span></div>
+        <div class="pnl"><div class="dig" id="dig">0:00</div><div class="knob"></div></div></div><div class="foods" id="foods"></div></div>`;
+      [['🍕', 'ピザ'], ['🍙', 'おにぎり'], ['🍜', 'ラーメン'], ['🍗', 'チキン'], ['🥟', 'ぎょうざ'], ['🍛', 'カレー']].forEach(f => {
+        const b = btn('tb', f[0]); onTap(b, el => this.choose(f, el)); $('#foods').appendChild(b);
+      });
+      setBig('あたため', false); setHint('たべものを えらんでね'); guide($('#foods'));
+    },
+    choose(f, el) {
+      if (this.phase !== 'choose' && this.phase !== 'ready') { shake(el); return; }
+      this.f = f; this.phase = 'ready'; SND.pop();
+      $('#win').innerHTML = `<span>${f[0]}</span>`; $('#dig').textContent = '0:05'; say(`${f[1]}を いれたよ`);
+      setBig('あたため', true); setHint('あたため を おしてね'); guide(big);
+    },
     async press() {
-      const f = pick([['🍕', 'ピザ'], ['🍙', 'おにぎり'], ['🍞', 'パン'], ['🍜', 'ラーメン'], ['🍗', 'チキン'], ['🥟', 'ぎょうざ'], ['🍛', 'カレー']]);
-      const w = $('#win'); w.innerHTML = `<span>${f[0]}</span>`; w.classList.add('hot'); SND.hum(); say('ブーン');
-      await wait(2000); if (!$('#win')) return; w.classList.remove('hot');
-      SND.chin(); say(`チン！ ${f[1]}が できたよ！`); await wait(600); celebrate();
+      if (this.phase === 'ready') {
+        this.phase = 'heat'; setBig('まってね', false); guide(null); setHint('できるまで まってね');
+        $('#foods').classList.add('dim'); $('#win').classList.add('hot'); SND.pi(); say('ブーン');
+        for (let s = 5; s > 0; s--) { if (s % 2) SND.hum(); $('#dig').textContent = `0:0${s}`; await sleep(1000); }
+        $('#dig').textContent = '0:00'; $('#win').classList.remove('hot');
+        SND.chin(); say('チン！ できたよ');
+        this.phase = 'done'; setBig('とりだす', true); setHint('とりだす を おしてね'); guide(big);
+      } else if (this.phase === 'done') {
+        this.phase = 'eat'; setBig('とりだす', false); guide(null); setHint('');
+        $('#win').innerHTML = `<span class="steam">♨️</span><span>${this.f[0]}</span>`;
+        say(`ほかほかの ${this.f[1]}、いただきます！`);
+        await sleep(900); celebrate(); await sleep(3000); this.init();
+      }
     } },
-  { id: 'vm', ico: '🧃', name: 'じはんき', card: '#e94b4b', bg: '#ffe3e3', btn: '#4d8bff', dark: '#2f5fbf', label: 'ポチッ', busy: true,
-    init() { disp.innerHTML = '<div class="vm"><div class="rows"><span>🧃</span><span>🥛</span><span>🍵</span><span>🍊</span><span>🍓</span><span>💧</span></div><div class="slot" id="slot"></div></div>'; },
+
+  /* ---------- じはんき：おかねを いれる → えらぶ → とりだす ---------- */
+  { id: 'vm', ico: '🧃', name: 'じはんき', card: '#e94b4b', bg: '#ffe3e3', btn: '#4d8bff', dark: '#2f5fbf',
+    init() {
+      this.money = 0; this.phase = 'buy';
+      disp.innerHTML = `<div class="vm"><div class="rows" id="rows"></div><div class="money" id="money">0えん</div><div class="slot" id="slot"></div></div>`;
+      [['🧃', 'りんごジュース', 100], ['🥛', 'ぎゅうにゅう', 100], ['🍵', 'おちゃ', 100],
+       ['🍊', 'オレンジジュース', 200], ['🍓', 'いちごミルク', 200], ['💧', 'おみず', 100]].forEach(d => {
+        const b = btn('dk', `${d[0]}<small>${d[2]}えん</small><i></i>`); b.dataset.p = d[2]; onTap(b, el => this.buy(d, el)); $('#rows').appendChild(b);
+      });
+      onTap($('#slot'), el => this.take(el));
+      this.refresh(); setBig('🪙 いれる', true); setHint('おかねを いれてね'); guide(big);
+    },
+    refresh() {
+      $('#money').textContent = `${this.money}えん`;
+      document.querySelectorAll('.dk').forEach(b => b.classList.toggle('lit', this.phase === 'buy' && this.money >= +b.dataset.p));
+    },
     async press() {
-      const d = pick([['🧃', 'りんごジュース'], ['🥛', 'ぎゅうにゅう'], ['🍵', 'おちゃ'], ['🍊', 'オレンジジュース'], ['🍓', 'いちごミルク'], ['💧', 'おみず']]);
-      SND.pi(); await wait(500); const sl = $('#slot'); if (!sl) return;
-      sl.innerHTML = `<span class="drop">${d[0]}</span>`; tone(120, 0, .3, 'square', .25, 45); tone(90, .08, .3, 'square', .2, 40);
-      say(`ガコン！ ${d[1]}が でたよ！`); await wait(700); celebrate();
+      if (this.phase !== 'buy') return;
+      if (this.money >= 300) { shake(big); say('もう はいらないよ。のみものを えらんでね'); guide($('#rows')); return; }
+      this.money += 100; SND.coin(); this.refresh(); say(`${this.money}えん`);
+      setHint('ひかっている のみものを えらんでね'); guide($('#rows'));
+    },
+    async buy(d, el) {
+      if (this.phase !== 'buy') { shake(el); return; }
+      if (this.money < d[2]) { shake(el); say(this.money ? `あと ${d[2] - this.money}えん たりないよ` : 'さきに おかねを いれてね'); return; }
+      this.phase = 'out'; this.d = d; this.money -= d[2]; const ch = this.money; this.money = 0; this.refresh();
+      setBig('🪙 いれる', false); guide(null); setHint('');
+      SND.pi(); await sleep(500);
+      $('#slot').innerHTML = `<span class="drop">${d[0]}</span>`; tone(120, 0, .3, 'square', .25, 45); tone(90, .08, .3, 'square', .2, 40);
+      say(`ガコン！ ${d[1]}が でたよ`); await sleep(1300);
+      if (ch) { for (let k = 0; k < ch / 100; k++) { SND.coin(); await sleep(200); } say(`おつり ${ch}えんも わすれずにね`); await sleep(1200); }
+      this.phase = 'take'; setHint('したの とりだしぐちを タッチしてね'); guide($('#slot'));
+    },
+    async take(el) {
+      if (this.phase !== 'take') { shake(el); return; }
+      this.phase = 'drink'; guide(null); setHint(''); $('#slot').innerHTML = '';
+      domFx(`<div class="e">${this.d[0]}</div><div class="t">ごくごく！</div>`, 'pop', 2500);
+      say(`${this.d[1]}、おいしいね！`); await sleep(1500); celebrate(); await sleep(3000);
+      this.phase = 'buy'; this.refresh(); setBig('🪙 いれる', true); setHint('おかねを いれてね'); guide(big);
     } },
-  { id: 'gacha', ico: '🎰', name: 'ガチャガチャ', card: '#ff8c42', bg: '#fff0e0', btn: '#3fd07a', dark: '#24914f', label: 'まわす', busy: true,
-    init() { disp.innerHTML = '<div class="gacha"><div class="dome" id="dome">🔴🟡🔵🟢🟣🔴🟡🔵🟢🟣🟠🔵</div><div class="base"><span class="out" id="cap"></span></div></div>'; },
+
+  /* ---------- ガチャ：おかねを いれる → 2かい まわす → カプセルを あける ---------- */
+  { id: 'gacha', ico: '🎰', name: 'ガチャガチャ', card: '#ff8c42', bg: '#fff0e0', btn: '#3fd07a', dark: '#24914f',
+    init() {
+      this.phase = 'coin'; this.turns = 0; this.rot = 0;
+      disp.innerHTML = `<div class="gacha"><div class="dome" id="dome">🔴🟡🔵🟢🟣🟠🔵🔴</div>
+        <div class="base"><div class="handle" id="handle">✚</div><span class="out" id="cap"></span></div>
+        <div class="turns" id="turns"></div><button class="tb coinbtn" id="coin">🪙 おかねを いれる</button></div>`;
+      onTap($('#coin'), el => this.coin(el)); onTap($('#cap'), el => this.open(el));
+      setBig('まわす', false); setHint('さきに おかねを いれてね'); guide($('#coin'));
+    },
+    coin(el) {
+      if (this.phase !== 'coin') { shake(el); return; }
+      this.phase = 'turn'; SND.coin(); say('チャリン！ ハンドルを まわしてね'); el.classList.add('dim');
+      $('#turns').textContent = 'あと 2かい まわしてね';
+      setBig('まわす', true); setHint('まわす を 2かい おしてね'); guide(big);
+    },
     async press() {
+      if (this.phase !== 'turn') return;
+      this.turns++; this.rot += 180; $('#handle').style.transform = `rotate(${this.rot}deg)`;
+      $('#dome').classList.remove('shake'); void $('#dome').offsetWidth; $('#dome').classList.add('shake');
+      tone(700, 0, .06, 'square', .1); tone(500, .12, .06, 'square', .1); tone(400, .24, .08, 'square', .1);
+      if (this.turns < 2) { say('ガチャ'); $('#turns').textContent = 'あと 1かい！'; await sleep(400); return; }
+      this.phase = 'wait'; setBig('まわす', false); guide(null); say('ガチャン！'); $('#turns').textContent = '';
+      await sleep(700);
+      const cap = $('#cap'); cap.textContent = pick(['🔴', '🟡', '🔵', '🟢', '🟣']); cap.classList.add('roll'); SND.pop();
+      this.phase = 'open'; setHint('カプセルを タッチして あけてね'); guide(cap);
+    },
+    async open(el) {
+      if (this.phase !== 'open') return;
+      this.phase = 'done'; guide(null); setHint('');
       const toy = pick([['🦖', 'きょうりゅう'], ['🚗', 'くるま'], ['🧸', 'くまのぬいぐるみ'], ['🤖', 'ロボット'], ['🚀', 'ロケット'], ['🦄', 'ユニコーン'], ['🚒', 'しょうぼうしゃ'], ['🐳', 'くじら']]);
-      say('ガチャ、ガチャ、なにかな？');
-      $('#dome').classList.add('shake');
-      for (let i = 0; i < 4; i++) { tone(700, 0, .06, 'square', .1); tone(500, .1, .06, 'square', .1); await wait(260); }
-      const cap = $('#cap'); if (!cap) return; $('#dome').classList.remove('shake');
-      cap.textContent = pick(['🔴', '🟡', '🔵', '🟢', '🟣']); cap.classList.remove('roll'); void cap.offsetWidth; cap.classList.add('roll');
-      SND.pop(); await wait(1000); if (!$('#cap')) return;
-      cap.textContent = toy[0]; SND.pop(); say(`${toy[1]}だ！`); await wait(500); celebrate();
+      SND.pop(); el.classList.remove('roll'); void el.offsetWidth; el.textContent = toy[0]; el.classList.add('roll');
+      say(`やったー！ ${toy[1]}だ！`); await sleep(800); celebrate(); await sleep(3000); this.init();
     } },
 ];
 
@@ -470,32 +847,29 @@ THEMES.forEach(t => {
   grid.appendChild(b);
 });
 
-let cur = null, running = false;
-const big = $('#big'), play = $('#play');
 function open(t) {
-  cur = t; running = false;
+  sid++; cur = t; running = false; t.phase = '';
   play.style.background = t.bg; big.style.setProperty('--btn', t.btn); big.style.setProperty('--dark', t.dark);
-  big.textContent = t.label; t.init(); updateBookN();
   clearFx(); document.querySelectorAll('.screen').forEach(e => e.classList.remove('on')); play.classList.add('on');
+  t.init(); updateBookN();
 }
 function goHome() {
-  try { speechSynthesis.cancel(); } catch (e) {}
-  cur = null; clearFx(); document.querySelectorAll('.screen').forEach(e => e.classList.remove('on')); $('#home').classList.add('on');
+  sid++; try { speechSynthesis.cancel(); } catch (e) {}
+  cur = null; running = false; guide(null); clearFx(); document.querySelectorAll('.screen').forEach(e => e.classList.remove('on')); $('#home').classList.add('on');
 }
 $('#back').addEventListener('click', goHome);
 $('#back2').addEventListener('click', goHome);
 $('#homeBook').addEventListener('click', () => { audio(); SND.pop(); showBook(); });
-$('#bookBtn').addEventListener('click', () => { audio(); SND.pop(); cur = null; showBook(); });
+$('#bookBtn').addEventListener('click', () => { audio(); SND.pop(); sid++; cur = null; running = false; showBook(); });
 
 big.addEventListener('pointerdown', e => { e.preventDefault(); big.classList.add('down'); });
 ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => big.addEventListener(ev, () => big.classList.remove('down')));
-big.addEventListener('click', async () => {
+big.addEventListener('click', () => {
   audio(); buzz();
   if (!cur) return;
-  if (running && cur.busy) { big.classList.remove('wiggle'); void big.offsetWidth; big.classList.add('wiggle'); return; }
-  running = true; big.classList.remove('glow'); void big.offsetWidth; big.classList.add('glow');
-  const t = cur;
-  try { await t.press(); } finally { if (cur === t) running = false; }
+  // いまは おせない → ゆれて「つぎに なにを するか」を おしえる
+  if (running || big.classList.contains('off')) { shake(big); nag(); return; }
+  run(() => cur.press());
 });
 
 document.addEventListener('contextmenu', e => e.preventDefault());
