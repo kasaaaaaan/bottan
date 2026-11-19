@@ -75,6 +75,10 @@
   .tb { border: none; font: inherit; color: #4a3b2a; background: #fff; border-radius: 14px; box-shadow: 0 4px 0 rgba(0,0,0,.15); }
   .tb:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,.15); }
   .dim { opacity: .35; }
+  #finger { position: fixed; z-index: 26; font-size: 52px; pointer-events: none; display: none;
+    filter: drop-shadow(0 3px 2px rgba(0,0,0,.25)); animation: poke .8s ease-in-out infinite; }
+  #finger.on { display: block; }
+  @keyframes poke { 50% { transform: translateY(-14px); } }
 
   /* レジ */
   .reji { width: min(100%, 360px); display: flex; flex-direction: column; gap: 8px; }
@@ -84,10 +88,10 @@
   .tray { min-height: 46px; background: #fff; border: 3px dashed #f3c6b0; border-radius: 12px; font-size: 30px;
     display: flex; flex-wrap: wrap; justify-content: center; align-items: center; }
   .tray em { font-size: 16px; color: #c9a99a; font-style: normal; }
-  .shelf { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .shelf { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
   .shelf.pay { grid-template-columns: repeat(3, 1fr); }
   .good { display: flex; flex-direction: column; align-items: center; padding: 4px 0 3px; }
-  .good span { font-size: 34px; line-height: 1.15; } .good small { font-size: 14px; }
+  .good span { font-size: 44px; line-height: 1.15; } .good small { font-size: 14px; }
   .cash { padding: 8px 0; font-size: 18px; } .cash span { display: block; font-size: 38px; line-height: 1.2; }
   .receipt { background: #fff; border-radius: 6px; padding: 12px 22px 14px; box-shadow: 0 6px 16px rgba(0,0,0,.15);
     animation: slide .5s ease-out; min-width: 250px; border-bottom: 6px dashed #eee; }
@@ -126,8 +130,8 @@
   .road { height: 86px; border-radius: 12px; position: relative; overflow: hidden; background: linear-gradient(#bfe6ff 0 62%, #8a8a8a 62%); }
   .road .scene { position: absolute; bottom: 30px; left: 0; white-space: nowrap; font-size: 34px; animation: scroll 5s linear infinite; }
   @keyframes scroll { to { transform: translateX(-50%) } }
-  .road .me { position: absolute; left: 22%; bottom: 4px; font-size: 54px; line-height: 1; }
-  .road .me span { display: inline-block; transform: scaleX(-1); animation: rattle .25s infinite alternate; }
+  .road .me { position: absolute; left: 22%; bottom: 4px; font-size: 54px; line-height: 1; transform: scaleX(-1); }
+  .road .me span { display: inline-block; animation: rattle .25s infinite alternate; }
   .road.stop .scene, .road.stop .me span { animation-play-state: paused; }
   .road .bs { position: absolute; right: 12%; bottom: 24px; font-size: 40px; opacity: 0; transition: opacity .5s; }
   .road .bs.show { opacity: 1; }
@@ -187,8 +191,8 @@
   .mw .pnl { width: 74px; background: #ccc; border-radius: 6px; display: flex; flex-direction: column; align-items: center; padding-top: 10px; gap: 12px; }
   .dig { background: #1f3b2c; color: #7dffb0; font-family: monospace; font-size: 20px; padding: 2px 5px; border-radius: 4px; text-shadow: 0 0 6px #3fd07a; }
   .knob { width: 36px; height: 36px; border-radius: 50%; background: #aaa; border: 4px solid #888; }
-  .foods { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; width: min(100%, 340px); }
-  .foods button { font-size: 30px; padding: 6px 0; }
+  .foods { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: min(100%, 300px); }
+  .foods button { font-size: 40px; padding: 4px 0; }
 
   /* ---------- リアクション ---------- */
   #fx { position: fixed; inset: 0; pointer-events: none; z-index: 20; }
@@ -425,7 +429,7 @@ const REACTIONS = [
     }, i * 120);
   },
 ];
-function clearFx() { dom.innerHTML = ''; parts = []; document.querySelectorAll('.flyer').forEach(f => f.remove()); }
+function clearFx() { dom.innerHTML = ''; parts = []; document.querySelectorAll('.flyer').forEach(f => f.remove()); if (window.guideOff) guideOff(); }
 
 /* ===================== シールちょう ===================== */
 const STICKERS = ['🐶','🐱','🐰','🐻','🐼','🐨','🦁','🐷','🐸','🐧','🐘','🦒','🦄','🦖','🐳','🦋',
@@ -493,7 +497,25 @@ const STOP = {};
 async function sleep(ms) { const s = sid; await wait(ms); if (s !== sid) throw STOP; }
 function setBig(label, on = true) { big.textContent = label; big.classList.toggle('off', !on); }
 function setHint(t) { hintEl.textContent = t; }
-function guide(el) { document.querySelectorAll('.guide').forEach(e => e.classList.remove('guide')); if (el) el.classList.add('guide'); }
+// つぎに おす ところを ゆびで さす（3さいでも わかるように）
+let guideEl = null;
+const finger = document.createElement('div'); finger.id = 'finger'; finger.textContent = '👆'; document.body.appendChild(finger);
+function placeFinger() {
+  if (!guideEl || !document.body.contains(guideEl) || !cur) { finger.classList.remove('on'); return; }
+  const r = guideEl.getBoundingClientRect();
+  const isBig = guideEl === big; // おおきい ボタンは もじに かからないよう みぎしたから さす
+  finger.style.left = (isBig ? r.right - 46 : r.left + r.width / 2 - 24) + 'px';
+  finger.style.top = Math.min(isBig ? r.bottom - 40 : r.bottom - 18, innerHeight - 70) + 'px';
+  finger.classList.add('on');
+}
+function guide(el) {
+  document.querySelectorAll('.guide').forEach(e => e.classList.remove('guide'));
+  if (el && el.classList.contains('many') && el.children.length) el = pick([...el.children]); // ならんでいる ものは どれか ひとつを さす
+  guideEl = el || null; if (el) el.classList.add('guide');
+  finger.classList.remove('on'); if (el) setTimeout(placeFinger, 650); // うごきが おちついてから
+}
+addEventListener('resize', placeFinger);
+function guideOff() { guideEl = null; finger.classList.remove('on'); }
 function shake(el) { el.classList.remove('wiggle'); void el.offsetWidth; el.classList.add('wiggle'); }
 let lastNag = 0;
 function nag() { // いま なにを すればいいか こえで おしえる（しつこくならないように）
@@ -517,66 +539,49 @@ SND.coin = () => { tone(2600, 0, .07, 'square', .07); tone(3300, .05, .3, 'sine'
 SND.psh  = () => { tone(500, 0, .5, 'sawtooth', .04, 120); };
 
 /* ===================== ボタンのしゅるい ===================== */
-const GOODS = [['🍎', 'りんご', 100], ['🍌', 'バナナ', 50], ['🍓', 'いちご', 200], ['🍩', 'ドーナツ', 150],
-               ['🍦', 'アイス', 100], ['🍪', 'クッキー', 50], ['🥛', 'ぎゅうにゅう', 150], ['🍙', 'おにぎり', 100]];
+const GOODS = [['🍎', 'りんご', 100], ['🍌', 'バナナ', 100], ['🍓', 'いちご', 200],
+               ['🍩', 'ドーナツ', 100], ['🍦', 'アイス', 100], ['🍙', 'おにぎり', 100]];
+const MWFOODS = [['🍕', 'ピザ'], ['🍙', 'おにぎり'], ['🍜', 'ラーメン'], ['🍗', 'チキン'], ['🥟', 'ぎょうざ'], ['🍛', 'カレー']];
+const DRINKS = [['🧃', 'りんごジュース'], ['🥛', 'ぎゅうにゅう'], ['🍵', 'おちゃ'], ['🍊', 'オレンジジュース'], ['🍓', 'いちごミルク'], ['💧', 'おみず']];
+const GACHA_ICON = `<svg viewBox="0 0 64 64" width="1em" height="1em" style="vertical-align:-.12em">
+  <rect x="10" y="38" width="44" height="24" rx="5" fill="#e94b4b"/><circle cx="32" cy="24" r="21" fill="#d8f1ff" stroke="#fff" stroke-width="3"/>
+  <circle cx="21" cy="17" r="6" fill="#a06cff"/><circle cx="33" cy="13" r="6" fill="#ffe14d"/><circle cx="44" cy="20" r="6" fill="#3fd07a"/>
+  <circle cx="24" cy="30" r="7" fill="#ff5a5a"/><circle cx="39" cy="32" r="7" fill="#4d8bff"/>
+  <circle cx="32" cy="51" r="7" fill="#fff"/><rect x="30.5" y="46" width="3" height="10" rx="1.5" fill="#e94b4b"/></svg>`;
 const STOPS = [['🚉', 'えきまえ'], ['🌳', 'こうえん'], ['🦁', 'どうぶつえん'], ['🏫', 'ようちえん'], ['🛒', 'スーパー'],
                ['🏥', 'びょういん'], ['🌊', 'うみ'], ['🎡', 'ゆうえんち'], ['📚', 'としょかん']];
 const FLOORS = { 1: ['🚪', 'いりぐち'], 2: ['🧸', 'おもちゃ うりば'], 3: ['📚', 'ほんや さん'], 4: ['🍦', 'アイス やさん'],
                  5: ['🍽️', 'レストラン'], 6: ['🎡', 'おくじょう ゆうえんち'] };
 
 const THEMES = [
-  /* ---------- レジ：しょうひんを えらぶ → ごうけい → おかねを もらう → おかいけい ---------- */
+  /* ---------- レジ：たべものを ピッ → おかいけい（2ステップ） ---------- */
   { id: 'reji', ico: '🛒', name: 'おみせの レジ', card: '#ff7a59', bg: '#ffe9dc', btn: '#ff5a5a', dark: '#c23b3b',
     init() {
-      this.cart = []; this.paid = 0; this.phase = 'scan';
+      this.cart = []; this.phase = 'scan';
       disp.innerHTML = `<div class="reji"><div class="lcd"><span id="lcd1">いらっしゃいませ</span><span id="lcd2"></span></div>
-        <div class="tray" id="tray"></div><div class="shelf" id="shelf"></div></div>`;
-      this.draw(); setBig('ごうけい', false); setHint('しょうひんを タッチしてね'); guide($('#shelf'));
+        <div class="tray" id="tray"><em>かご</em></div><div class="shelf many" id="shelf"></div></div>`;
+      GOODS.forEach(g => { const b = btn('tb good', `<span>${g[0]}</span><small>${g[2]}えん</small>`); onTap(b, el => this.scan(g, el)); $('#shelf').appendChild(b); });
+      setBig('おかいけい', false); setHint('たべものを タッチしてね'); guide($('#shelf'));
     },
     total() { return this.cart.reduce((a, g) => a + g[2], 0); },
-    lcd(a, b) { $('#lcd1').textContent = a; $('#lcd2').textContent = b; },
-    draw() {
-      $('#tray').innerHTML = this.cart.map(g => `<span>${g[0]}</span>`).join('') || '<em>かご</em>';
-      const sh = $('#shelf'); sh.innerHTML = ''; sh.classList.toggle('pay', this.phase === 'pay');
-      if (this.phase === 'scan') GOODS.forEach(g => {
-        const b = btn('tb good', `<span>${g[0]}</span><small>${g[2]}えん</small>`); onTap(b, el => this.scan(g, el)); sh.appendChild(b);
-      });
-      else [[100, '🪙'], [500, '🪙'], [1000, '💴']].forEach(([v, e]) => {
-        const b = btn('tb cash', `<span>${e}</span>${v}えん`); onTap(b, el => this.pay(v, el)); sh.appendChild(b);
-      });
-    },
     scan(g, el) {
-      if (this.cart.length >= 6) { shake(el); say('かごが いっぱいだよ。ごうけいを おしてね'); guide(big); return; }
-      this.cart.push(g); SND.pi(); this.lcd(`${g[0]} ${g[1]}`, `${g[2]}えん`); say(`${g[1]}、${g[2]}えん`);
+      if (this.phase !== 'scan') { shake(el); return; }
+      if (this.cart.length >= 5) { shake(el); say('かごが いっぱい！ おかいけいを おしてね'); guide(big); return; }
+      this.cart.push(g); SND.pi(); say(g[1]);
+      $('#lcd1').textContent = `${g[0]} ${g[2]}えん`; $('#lcd2').textContent = `${this.total()}えん`;
       $('#tray').innerHTML = this.cart.map(g => `<span>${g[0]}</span>`).join('');
-      setBig('ごうけい', true); setHint('おわったら ごうけい を おしてね'); guide(big);
-    },
-    pay(v, el) {
-      const t = this.total();
-      if (this.paid >= t) { shake(el); guide(big); return; }
-      this.paid += v; SND.coin(); this.lcd(`おあずかり`, `${this.paid}えん`);
-      if (this.paid >= t) { say(`${this.paid}えん おあずかりします`); setBig('おかいけい', true); setHint('おかいけい を おしてね'); guide(big); }
-      else say(`あと ${t - this.paid}えん`);
+      setBig('おかいけい', true); setHint('おかいけい を おしてね'); guide(big);
     },
     async press() {
-      if (this.phase === 'scan') {
-        SND.pi(); await sleep(120); SND.pi();
-        const t = this.total(); this.phase = 'pay'; this.draw(); this.lcd('ごうけい', `${t}えん`);
-        say(`ごうけい ${t}えんです`);
-        setBig('おかいけい', false); setHint('おかねを タッチしてね'); guide($('#shelf'));
-      } else if (this.phase === 'pay') {
-        this.phase = 'done'; setBig('ありがとう', false); guide(null); setHint('');
-        const t = this.total(), ch = this.paid - t;
-        tone(180, 0, .15, 'square', .15); await sleep(200); SND.chin();
-        disp.innerHTML = `<div class="receipt"><div class="items">${this.cart.map(g => g[0]).join('')}</div>
-          <div class="row sum"><span>ごうけい</span><span>${t}えん</span></div>
-          <div class="row"><span>おあずかり</span><span>${this.paid}えん</span></div>
-          <div class="row"><span>おつり</span><span>${ch}えん</span></div>
-          <div class="ty">ありがとうございました</div></div>`;
-        say(ch ? `おつりは ${ch}えんです。ありがとうございました！` : 'ちょうど いただきます。ありがとうございました！');
-        await sleep(1500); celebrate(); await sleep(3000);
-        setBig('つぎの おきゃくさん', true); setHint('つぎの おきゃくさんを よぼう'); guide(big);
-      } else { SND.pop(); this.init(); say('いらっしゃいませ！'); }
+      this.phase = 'done'; setBig('おかいけい', false); guide(null); setHint('');
+      const t = this.total();
+      SND.pi(); await sleep(120); SND.pi(); $('#lcd1').textContent = 'ごうけい'; $('#lcd2').textContent = `${t}えん`;
+      say(`ぜんぶで ${t}えんです`); await sleep(1600);
+      for (let k = 0; k < 3; k++) { SND.coin(); await sleep(180); }
+      tone(180, 0, .15, 'square', .15); await sleep(200); SND.chin();
+      disp.innerHTML = `<div class="receipt"><div class="items">${this.cart.map(g => g[0]).join('')}</div>
+        <div class="row sum"><span>ごうけい</span><span>${t}えん</span></div><div class="ty">ありがとうございました</div></div>`;
+      say('ありがとうございました！'); await sleep(1300); celebrate(); await sleep(3500); this.init();
     } },
 
   /* ---------- ピンポン：ならす → だれか きた → ドアを あける ---------- */
@@ -659,28 +664,27 @@ const THEMES = [
       setBig('とまります', false); setHint(`${this.st()[1]}で とまるよ`); guide(null);
     } },
 
-  /* ---------- エレベーター：いきたい かいを えらぶ → しまる ---------- */
+  /* ---------- エレベーター：かいの ボタン（または おおきい ボタン）を おすだけ ---------- */
   { id: 'elev', ico: '🛗', name: 'エレベーター', card: '#7d8ea3', bg: '#eef1f5', btn: '#ffb233', dark: '#c47e0c', floor: 1,
     init() {
-      this.to = null; const f = FLOORS[this.floor];
+      const f = FLOORS[this.floor];
       disp.innerHTML = `<div class="elev"><div class="ecol"><div class="ind"><span id="arr"></span><b id="fl">${this.floor}</b></div>
         <div class="cab" id="cab"><span class="ins" id="ins">${f[0]}</span><span class="nm" id="fnm">${f[1]}</span><div class="dl"></div><div class="dr"></div></div></div>
-        <div class="panel" id="pnl"></div></div>`;
+        <div class="panel many" id="pnl"></div></div>`;
       [5, 6, 3, 4, 1, 2].forEach(n => {
-        const b = btn('fb', `${n}<small>${FLOORS[n][0]}</small>`); b.dataset.n = n; onTap(b, el => this.select(n, el)); $('#pnl').appendChild(b);
+        const b = btn('fb', `${n}<small>${FLOORS[n][0]}</small>`); b.dataset.n = n;
+        onTap(b, el => { if (n === this.floor) { shake(el); say(`ここが ${n}かい、${FLOORS[n][1]}だよ`); return; } return this.go(n); });
+        $('#pnl').appendChild(b);
       });
       this.ready();
     },
-    ready() { setBig('しまる ▶◀', false); setHint('いきたい かいを えらんでね'); guide($('#pnl')); },
-    select(n, el) {
-      if (n === this.floor) { shake(el); say(`ここが ${n}かい、${FLOORS[n][1]}だよ`); return; }
-      this.to = n; document.querySelectorAll('.fb').forEach(b => b.classList.toggle('lit', +b.dataset.n === n));
-      SND.pi(); say(`${n}かい、${FLOORS[n][1]}`);
-      setBig('しまる ▶◀', true); setHint('しまる を おしてね'); guide(big);
-    },
-    async press() {
-      const to = this.to; setBig('しまる ▶◀', false); guide(null); setHint('');
-      $('#cab').classList.add('closed'); say('ドアが しまります'); await sleep(900);
+    ready() { setBig('うごかす', true); setHint('いきたい かいを おしてね'); guide($('#pnl')); },
+    async press() { let n; do { n = 1 + Math.floor(Math.random() * 6); } while (n === this.floor); return this.go(n); },
+    async go(to) {
+      document.querySelectorAll('.fb').forEach(b => b.classList.toggle('lit', +b.dataset.n === to));
+      SND.pi(); say(`${to}かい、${FLOORS[to][1]}へ いくよ`);
+      setBig('うごいてるよ', false); guide(null); setHint('');
+      await sleep(500); $('#cab').classList.add('closed'); await sleep(900);
       const step = to > this.floor ? 1 : -1; $('#arr').textContent = step > 0 ? '▲' : '▼';
       while (this.floor !== to) {
         await sleep(700); this.floor += step; $('#fl').textContent = this.floor; SND.tick();
@@ -688,7 +692,7 @@ const THEMES = [
       }
       await sleep(400); SND.pon(); $('#arr').textContent = '';
       $('#cab').classList.remove('closed'); document.querySelectorAll('.fb').forEach(b => b.classList.remove('lit'));
-      say(`${to}かい、${FLOORS[to][1]}です`); this.to = null;
+      say(`${to}かい、${FLOORS[to][1]}です`);
       await sleep(1300); celebrate(); await sleep(2500); this.ready();
     } },
 
@@ -728,112 +732,85 @@ const THEMES = [
       }
     } },
 
-  /* ---------- でんしレンジ：たべものを いれる → あたため → とりだす ---------- */
+  /* ---------- でんしレンジ：（たべものを えらんで）あたため → チン ---------- */
   { id: 'mw', ico: '🍱', name: 'でんしレンジ', card: '#e86a92', bg: '#ffe6ee', btn: '#ff6f9a', dark: '#c4426b',
     init() {
-      this.phase = 'choose'; this.f = null;
+      this.f = null;
       disp.innerHTML = `<div class="mwbox"><div class="mw"><div class="win" id="win"><span>🍽️</span></div>
-        <div class="pnl"><div class="dig" id="dig">0:00</div><div class="knob"></div></div></div><div class="foods" id="foods"></div></div>`;
-      [['🍕', 'ピザ'], ['🍙', 'おにぎり'], ['🍜', 'ラーメン'], ['🍗', 'チキン'], ['🥟', 'ぎょうざ'], ['🍛', 'カレー']].forEach(f => {
-        const b = btn('tb', f[0]); onTap(b, el => this.choose(f, el)); $('#foods').appendChild(b);
-      });
-      setBig('あたため', false); setHint('たべものを えらんでね'); guide($('#foods'));
+        <div class="pnl"><div class="dig" id="dig">0:00</div><div class="knob"></div></div></div><div class="foods many" id="foods"></div></div>`;
+      MWFOODS.forEach(f => { const b = btn('tb', f[0]); onTap(b, el => this.choose(f, el)); $('#foods').appendChild(b); });
+      setBig('あたため', true); setHint('たべものを えらんで あたため を おしてね'); guide($('#foods'));
     },
-    choose(f, el) {
-      if (this.phase !== 'choose' && this.phase !== 'ready') { shake(el); return; }
-      this.f = f; this.phase = 'ready'; SND.pop();
+    choose(f) {
+      this.f = f; SND.pop();
       $('#win').innerHTML = `<span>${f[0]}</span>`; $('#dig').textContent = '0:05'; say(`${f[1]}を いれたよ`);
-      setBig('あたため', true); setHint('あたため を おしてね'); guide(big);
+      setHint('あたため を おしてね'); guide(big);
     },
     async press() {
-      if (this.phase === 'ready') {
-        this.phase = 'heat'; setBig('まってね', false); guide(null); setHint('できるまで まってね');
-        $('#foods').classList.add('dim'); $('#win').classList.add('hot'); SND.pi(); say('ブーン');
-        for (let s = 5; s > 0; s--) { if (s % 2) SND.hum(); $('#dig').textContent = `0:0${s}`; await sleep(1000); }
-        $('#dig').textContent = '0:00'; $('#win').classList.remove('hot');
-        SND.chin(); say('チン！ できたよ');
-        this.phase = 'done'; setBig('とりだす', true); setHint('とりだす を おしてね'); guide(big);
-      } else if (this.phase === 'done') {
-        this.phase = 'eat'; setBig('とりだす', false); guide(null); setHint('');
-        $('#win').innerHTML = `<span class="steam">♨️</span><span>${this.f[0]}</span>`;
-        say(`ほかほかの ${this.f[1]}、いただきます！`);
-        await sleep(900); celebrate(); await sleep(3000); this.init();
-      }
+      if (!this.f) { this.choose(pick(MWFOODS)); await sleep(800); }
+      setBig('まってね', false); guide(null); setHint('できるまで まってね');
+      $('#foods').classList.add('dim'); $('#win').classList.add('hot'); SND.pi(); say('ブーン');
+      for (let s = 5; s > 0; s--) { if (s % 2) SND.hum(); $('#dig').textContent = `0:0${s}`; await sleep(1000); }
+      $('#dig').textContent = '0:00'; $('#win').classList.remove('hot'); SND.chin();
+      $('#win').innerHTML = `<span class="steam">♨️</span><span>${this.f[0]}</span>`;
+      say(`チン！ ほかほかの ${this.f[1]}が できたよ`);
+      await sleep(1200); celebrate(); await sleep(3000); this.init();
     } },
 
-  /* ---------- じはんき：おかねを いれる → えらぶ → とりだす ---------- */
+  /* ---------- じはんき：おかねを いれる → のみものを タッチ ---------- */
   { id: 'vm', ico: '🧃', name: 'じはんき', card: '#e94b4b', bg: '#ffe3e3', btn: '#4d8bff', dark: '#2f5fbf',
     init() {
-      this.money = 0; this.phase = 'buy';
-      disp.innerHTML = `<div class="vm"><div class="rows" id="rows"></div><div class="money" id="money">0えん</div><div class="slot" id="slot"></div></div>`;
-      [['🧃', 'りんごジュース', 100], ['🥛', 'ぎゅうにゅう', 100], ['🍵', 'おちゃ', 100],
-       ['🍊', 'オレンジジュース', 200], ['🍓', 'いちごミルク', 200], ['💧', 'おみず', 100]].forEach(d => {
-        const b = btn('dk', `${d[0]}<small>${d[2]}えん</small><i></i>`); b.dataset.p = d[2]; onTap(b, el => this.buy(d, el)); $('#rows').appendChild(b);
-      });
-      onTap($('#slot'), el => this.take(el));
+      this.money = 0; this.phase = 'coin';
+      disp.innerHTML = `<div class="vm"><div class="rows many" id="rows"></div><div class="money" id="money">0えん</div><div class="slot" id="slot"></div></div>`;
+      DRINKS.forEach(d => { const b = btn('dk', `${d[0]}<small>100えん</small><i></i>`); onTap(b, el => this.buy(d, el)); $('#rows').appendChild(b); });
       this.refresh(); setBig('🪙 いれる', true); setHint('おかねを いれてね'); guide(big);
     },
     refresh() {
       $('#money').textContent = `${this.money}えん`;
-      document.querySelectorAll('.dk').forEach(b => b.classList.toggle('lit', this.phase === 'buy' && this.money >= +b.dataset.p));
+      document.querySelectorAll('.dk').forEach(b => b.classList.toggle('lit', this.money >= 100));
     },
     async press() {
-      if (this.phase !== 'buy') return;
-      if (this.money >= 300) { shake(big); say('もう はいらないよ。のみものを えらんでね'); guide($('#rows')); return; }
-      this.money += 100; SND.coin(); this.refresh(); say(`${this.money}えん`);
-      setHint('ひかっている のみものを えらんでね'); guide($('#rows'));
+      this.money = 100; this.phase = 'buy'; SND.coin(); this.refresh(); say('チャリン！ のみものを えらんでね');
+      setBig('🪙 いれる', false); setHint('ひかっている のみものを タッチしてね'); guide($('#rows'));
     },
     async buy(d, el) {
-      if (this.phase !== 'buy') { shake(el); return; }
-      if (this.money < d[2]) { shake(el); say(this.money ? `あと ${d[2] - this.money}えん たりないよ` : 'さきに おかねを いれてね'); return; }
-      this.phase = 'out'; this.d = d; this.money -= d[2]; const ch = this.money; this.money = 0; this.refresh();
-      setBig('🪙 いれる', false); guide(null); setHint('');
+      if (this.phase !== 'buy') { shake(el); say('さきに おかねを いれてね'); guide(big); return; }
+      this.phase = 'out'; this.money = 0; this.refresh(); guide(null); setHint('');
       SND.pi(); await sleep(500);
       $('#slot').innerHTML = `<span class="drop">${d[0]}</span>`; tone(120, 0, .3, 'square', .25, 45); tone(90, .08, .3, 'square', .2, 40);
       say(`ガコン！ ${d[1]}が でたよ`); await sleep(1300);
-      if (ch) { for (let k = 0; k < ch / 100; k++) { SND.coin(); await sleep(200); } say(`おつり ${ch}えんも わすれずにね`); await sleep(1200); }
-      this.phase = 'take'; setHint('したの とりだしぐちを タッチしてね'); guide($('#slot'));
-    },
-    async take(el) {
-      if (this.phase !== 'take') { shake(el); return; }
-      this.phase = 'drink'; guide(null); setHint(''); $('#slot').innerHTML = '';
-      domFx(`<div class="e">${this.d[0]}</div><div class="t">ごくごく！</div>`, 'pop', 2500);
-      say(`${this.d[1]}、おいしいね！`); await sleep(1500); celebrate(); await sleep(3000);
-      this.phase = 'buy'; this.refresh(); setBig('🪙 いれる', true); setHint('おかねを いれてね'); guide(big);
+      domFx(`<div class="e">${d[0]}</div><div class="t">ごくごく！</div>`, 'pop', 2500);
+      await sleep(800); celebrate(); await sleep(3000); this.init();
     } },
 
-  /* ---------- ガチャ：おかねを いれる → 2かい まわす → カプセルを あける ---------- */
-  { id: 'gacha', ico: '🎰', name: 'ガチャガチャ', card: '#ff8c42', bg: '#fff0e0', btn: '#3fd07a', dark: '#24914f',
+  /* ---------- ガチャ：まわす → カプセルを あける ---------- */
+  { id: 'gacha', ico: GACHA_ICON, name: 'ガチャガチャ', card: '#ff8c42', bg: '#fff0e0', btn: '#3fd07a', dark: '#24914f',
     init() {
-      this.phase = 'coin'; this.turns = 0; this.rot = 0;
+      this.phase = 'turn'; this.rot = this.rot || 0;
       disp.innerHTML = `<div class="gacha"><div class="dome" id="dome">🔴🟡🔵🟢🟣🟠🔵🔴</div>
-        <div class="base"><div class="handle" id="handle">✚</div><span class="out" id="cap"></span></div>
-        <div class="turns" id="turns"></div><button class="tb coinbtn" id="coin">🪙 おかねを いれる</button></div>`;
-      onTap($('#coin'), el => this.coin(el)); onTap($('#cap'), el => this.open(el));
-      setBig('まわす', false); setHint('さきに おかねを いれてね'); guide($('#coin'));
-    },
-    coin(el) {
-      if (this.phase !== 'coin') { shake(el); return; }
-      this.phase = 'turn'; SND.coin(); say('チャリン！ ハンドルを まわしてね'); el.classList.add('dim');
-      $('#turns').textContent = 'あと 2かい まわしてね';
-      setBig('まわす', true); setHint('まわす を 2かい おしてね'); guide(big);
+        <div class="base"><div class="handle" id="handle">✚</div><span class="out" id="cap"></span></div></div>`;
+      onTap($('#cap'), () => this.open());
+      setBig('まわす', true); setHint('まわす を おしてね'); guide(big);
     },
     async press() {
-      if (this.phase !== 'turn') return;
-      this.turns++; this.rot += 180; $('#handle').style.transform = `rotate(${this.rot}deg)`;
-      $('#dome').classList.remove('shake'); void $('#dome').offsetWidth; $('#dome').classList.add('shake');
-      tone(700, 0, .06, 'square', .1); tone(500, .12, .06, 'square', .1); tone(400, .24, .08, 'square', .1);
-      if (this.turns < 2) { say('ガチャ'); $('#turns').textContent = 'あと 1かい！'; await sleep(400); return; }
-      this.phase = 'wait'; setBig('まわす', false); guide(null); say('ガチャン！'); $('#turns').textContent = '';
-      await sleep(700);
+      if (this.phase === 'open') return this.open();
+      this.phase = 'wait'; setBig('まわす', false); guide(null); setHint('');
+      SND.coin(); await sleep(400);
+      for (let k = 0; k < 2; k++) {
+        this.rot += 180; $('#handle').style.transform = `rotate(${this.rot}deg)`;
+        $('#dome').classList.remove('shake'); void $('#dome').offsetWidth; $('#dome').classList.add('shake');
+        tone(700, 0, .06, 'square', .1); tone(500, .12, .06, 'square', .1); tone(400, .24, .08, 'square', .1);
+        say(k ? 'ガチャン！' : 'ガチャ'); await sleep(600);
+      }
       const cap = $('#cap'); cap.textContent = pick(['🔴', '🟡', '🔵', '🟢', '🟣']); cap.classList.add('roll'); SND.pop();
-      this.phase = 'open'; setHint('カプセルを タッチして あけてね'); guide(cap);
+      await sleep(600);
+      this.phase = 'open'; setBig('あける', true); setHint('カプセルを あけよう'); guide(cap);
     },
-    async open(el) {
+    async open() {
       if (this.phase !== 'open') return;
-      this.phase = 'done'; guide(null); setHint('');
+      this.phase = 'done'; setBig('あける', false); guide(null); setHint('');
       const toy = pick([['🦖', 'きょうりゅう'], ['🚗', 'くるま'], ['🧸', 'くまのぬいぐるみ'], ['🤖', 'ロボット'], ['🚀', 'ロケット'], ['🦄', 'ユニコーン'], ['🚒', 'しょうぼうしゃ'], ['🐳', 'くじら']]);
-      SND.pop(); el.classList.remove('roll'); void el.offsetWidth; el.textContent = toy[0]; el.classList.add('roll');
+      const el = $('#cap'); SND.pop(); el.classList.remove('roll'); void el.offsetWidth; el.textContent = toy[0]; el.classList.add('roll');
       say(`やったー！ ${toy[1]}だ！`); await sleep(800); celebrate(); await sleep(3000); this.init();
     } },
 ];
